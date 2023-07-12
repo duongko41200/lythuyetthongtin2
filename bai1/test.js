@@ -1,60 +1,46 @@
-let M = prompt("Nhập số hàng M: ");
-let N = prompt("Nhập số cột N: ");
 
-let probabilities = [];
-for (let i = 0; i < M; i++) {
-  let row = [];
-  for (let j = 0; j < N;j++) {
-    while (true) {
-      let prob = eval(prompt(`Nhập xác suấ P(${i+1},${j+1})` ));
-      if (prob && prob >= 0 && prob <= 1) {
-        row.push(prob);
-        break;
-      } else {
-        alert("Xác suất không thỏa mãn. Vui lòng nhập lại.");
+let sumP = 0  // biến  check tổng phan tử trong ma tran ket hop co === 1 không
+let probabilities = []
+const input = () =>{
+
+
+while(true){
+  let M = prompt("Nhập số hàng M: ");
+  let N = prompt("Nhập số cột N: ");
+  probabilities = [];
+  sumP = 0
+  for (let i = 0; i < M; i++) {
+    let row = [];
+    for (let j = 0; j < N;j++) {
+      while (true) {
+        let prob = eval(prompt(`Nhập xác suấ P(${i+1},${j+1})` ));
+        if (prob && prob >= 0 && prob <= 1) {
+          row.push(prob);
+          sumP += prob
+          break;
+        } else {
+          alert("không được âm và lớn hơn 1");
+        }
       }
     }
+    probabilities.push(row);
   }
-  probabilities.push(row);
+  
+
+  if(sumP != 1){
+    alert("Xác suất không thỏa mãn. Vui lòng nhập lại.");
+  }else{
+    break
+  }
 }
+
 
 console.log("ma trận kết hợp P(x,y):",probabilities);
 
-// let R = []
+}
 
-// for (let i = 0; i< M; i++) {
-//     let rows = []
+input()
 
-//     for (let j = 0; j < probabilities[i].length;j++) {
-//         if(i + 1 < M){
-//             let x = P[i][j]*P[i+1][i]
-
-//         console.log(`giá trị x ${j+1} `,P[i][j]*P[i+1][i])
-//         rows.push(x)
-
-//         }else{
-//             let x = P[i-1][j]*P[i][i]
-//             console.log(`giá trị y${j+1} `,P[i-1][j]*P[i][i])
-//             rows.push(x)
-
-//         }
-
-//     }
-//     R.push(rows)
-
-// }
-
-// console.log("ma trận ket hợp R(x,y):",R);
-
-
-
-// let probabilities = [
-//   [2/9, 1/18, 1/18],
-//   [1/18, 2/9, 1/18],
-//     [1/19,1/18,2/9]
-
-
-// ];
 
 
 
