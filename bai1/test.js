@@ -1,3 +1,7 @@
+// -----------------------------------------------------------------------------------------------------
+// // Câu a nhập kích thước ma trận và nhập ma trận kết hợp
+// -----------------------------------------------------------------------------------------------------
+
 
 let sumP = 0  // biến  check tổng phan tử trong ma tran ket hop co === 1 không
 let probabilities = []
@@ -14,12 +18,12 @@ while(true){
     for (let j = 0; j < N;j++) {
       while (true) {
         let prob = eval(prompt(`Nhập xác suấ P(${i+1},${j+1})` ));
-        if (prob && prob >= 0 && prob <= 1) {
+        if (prob > 0 && prob < 1) {
           row.push(prob);
           sumP += prob
           break;
         } else {
-          alert("không được âm và lớn hơn 1");
+          alert("không được âm , bằng 0, lớn hơn 1");
         }
       }
     }
@@ -41,27 +45,30 @@ console.log("ma trận kết hợp P(x,y):",probabilities);
 
 input()
 
+// -----------------------------------------------------------------------------------------------------------------------
+// // câu b, tính giá trị H(X),H(Y),H(X|Y),H(Y|X),H(X,Y),H(Y)-H(Y|X), I(X,Y)
+// ------------------------------------------------------------------------------------------------------------------------
 
 
-
-/// ////////////////////////// tính H(x) ////////////////////////////////////////////////////////////////
+// 1.TÍNH H(X)
 function entropyHx(probabilities) {
-  let conditionalEntropy = 0;
+  let Hx = 0;
 
   for (let i = 0; i < probabilities.length; i++) {
-    let sum = 0;
+    let sumRow = 0;
     for (let j = 0; j < probabilities[i].length;j++) {
-      sum += probabilities[i][j];
+      sumRow += probabilities[i][j];
     }
-    conditionalEntropy -= sum * Math.log2(sum);
+    Hx -= sumRow * Math.log2(sumRow);
   }
-  return conditionalEntropy;
+  return Hx;
 }
 
 
-//////////////////////////////////////// tính H(y)  /////////////////////////////////////////////////////////////////
+// 2. TÍNH H(Y)
+// -------------------------------------------------------
 const entropyHy = (probabilities) => {
-  let conditionalEntropy = 0;
+  let Hy = 0;
 
   const columnSums = [];
   
@@ -80,14 +87,15 @@ const entropyHy = (probabilities) => {
   // tính entropy của H(y)
   for (let i = 0; i < columnSums.length; i++) {
 
-    conditionalEntropy -= columnSums[i] * Math.log2(columnSums[i]);
+    Hy-= columnSums[i] * Math.log2(columnSums[i]);
   }
-  return conditionalEntropy;
+  return Hy;
 };
 
-//////////////////// tính H(x,y) ////////////////////////////////////////////////////////////////////////////////
 
 
+// 3. TÍNH H(X,Y)
+// ----------------------------------------------------------------------------
 const entropyHxy = (probabilities) => {
   let conditionalEntropy = 0;
   for (let i = 0; i < probabilities.length; i++) {
@@ -101,8 +109,13 @@ const entropyHxy = (probabilities) => {
 };
 
 
-///////////////////////  tính H(X|Y)    //////////////////////////////////////////////////////////////////////////
 
+
+// 4. TÍNH H(X|Y)
+// ----------------------------------------------------------------------------
+
+
+// B1.TÍNH Py
 const py =(probabilities)=>{
   const columnSums = [];
   
@@ -123,25 +136,26 @@ const py =(probabilities)=>{
 }
 
 
-// tính xác suất P(x|y)
+// B2.TÍNH XÁC XUẤT P(x|y)
 const conditionalProbabilities = (probabilities) => {
-  let y = py(probabilities) // p(y)
-  let arr = [] // đây là P(x\y)
+  let y = py(probabilities) 
+  let arrP = [] // đây là P(x\y)
   let arrStemp = []
   for (let i = 0; i < probabilities.length; i++) {
     for (let j = 0; j < probabilities[i].length;j++) {
-      let a = probabilities[i][j] / y[j] /// tính giái trị của các P(X1/Y1)
+      /// tính giái trị của các P(Xi/Yi)
+      let a = probabilities[i][j] / y[j] 
       arrStemp = [...arrStemp,a]
     }
-    arr = [...arr,arrStemp]
+    arrP = [...arrP,arrStemp]
     arrStemp = []
    
   }
   // console.log("ma trận P(x/y)",arr)
-  return arr
+  return arrR
 };
 
-/////// H(X|Y)
+// B3. TÍNH H(X|Y)
 const conditionalEntropy = (probabilities)=>{
   let p = conditionalProbabilities(probabilities)
   let conditionalEntropy = 0
@@ -160,7 +174,10 @@ const conditionalEntropy = (probabilities)=>{
 
 
 
-///////////////// H(Y|X) /////////////////////////////////////////////////////////////////////////////////////////////
+// 5. Tính H(Y|X) 
+// ----------------------------------------------------------------------------
+
+// B1.TÍNH Px
 const px =(probabilities)=>{
   let x =[]
   for (let i = 0; i < probabilities.length; i++) {
@@ -177,7 +194,7 @@ const px =(probabilities)=>{
 }
 
 
-//P(Y/X)
+// B2.TÍNH XÁC XUẤT P(Y/X)
 const conditionalProbabilities2 = (probabilities) => {
   let x = px(probabilities) // p(y)
   let arr = [] // đây là P(y\x)
@@ -196,7 +213,7 @@ const conditionalProbabilities2 = (probabilities) => {
 };
 
 
-
+//B3. TÍNH H(Y/X)
 const conditionalEntropy2 = (probabilities)=>{
   let p = conditionalProbabilities2(probabilities)
   let conditionalEntropy = 0
@@ -215,7 +232,7 @@ const conditionalEntropy2 = (probabilities)=>{
 
 
 
-/////////////////// H(Y) - H(Y | X)///////////////////////////
+// 6. TÍNH H(Y) - H(Y | X)
 
 const calculate = (probabilities)=>{
 
@@ -224,35 +241,37 @@ const calculate = (probabilities)=>{
 
 
 
-//////////////////////// I(x,y)-Lượng tin tương hỗ ////////////////////
+// 7. TÍNH I(x,y)-Lượng tin tương hỗ 
 
 const mutualInformation =(probabilities)=> {
-  let mutualInformation = 0;
+  let I = 0;
   let x = px(probabilities)
   let p = conditionalProbabilities(probabilities)
 
   for (let i = 0; i < probabilities.length; i++) {
     for (let j = 0; j < probabilities[i].length;j++) {
-      mutualInformation +=probabilities[i][j]  * Math.log2(p[i][j] / x[i]);       
+     I +=probabilities[i][j]  * Math.log2(p[i][j] / x[i]);       
     }
    
   }
 
-  return mutualInformation;
+  return I;
 }
 
+// -----------------------------------------------------------------------------------------------------------------------
+// // câu c, tính giá trị D(P(X||P(Y))) VÀ D(P(Y)||P(X))
+// ------------------------------------------------------------------------------------------------------------------------
 
-/////////////////////////////// tính emtropy tương đối ///////////////////////////////////////////////
 
 let Px =px(probabilities)
 let Py = py(probabilities)
-function calculateKLDivergence(Px, Py) {
+function calculateKLDivergence(a, b) {
   let klDivergence = 0;
-  if(Px.length != Py.length) return "không xác định"
+  if(a.length != b.length) return "không xác định"
 
-  for (let i = 0; i < Px.length; i++) {
-    let pxValue = Px[i];
-    let pyValue = Py[i];
+  for (let i = 0; i < a.length; i++) {
+    let pxValue = a[i];
+    let pyValue = b[i];
     klDivergence += pxValue * Math.log2(pxValue / pyValue);
  
   }
@@ -260,21 +279,21 @@ function calculateKLDivergence(Px, Py) {
 }
 
 
-// Tính D(P(x)||P(y))
+// 1. Tính D(P(x)||P(y))
 let divergenceXY = calculateKLDivergence(Px, Py);
 
-// Tính D(P(y)||P(x))
+// 2. Tính D(P(y)||P(x))
 let divergenceYX = calculateKLDivergence(Py, Px);
 
 
-
+// ----------------------------------------------------------------------------------------------
 // Tính và hiển thị các giá trị
-console.log("H(X): " + entropyHx(probabilities));
-console.log("H(Y): " + entropyHy(probabilities));
-console.log("H(X,Y)"+entropyHxy(probabilities));
-console.log("H(X | Y): " + conditionalEntropy(probabilities))
-console.log("H(Y | X): " + conditionalEntropy2(probabilities))
-console.log("H(Y) - H(Y | X): " + calculate(probabilities));
-console.log("I(X; Y): " + mutualInformation(probabilities));
-console.log("D(P(x)||P(y)): " + divergenceXY);
-console.log("D(P(y)||P(x)): " + divergenceYX);
+console.log("Gía trị của H(X): " + entropyHx(probabilities));
+console.log("Gía trị của H(Y): " + entropyHy(probabilities));
+console.log("Gía trị của H(X,Y)"+entropyHxy(probabilities));
+console.log("Gía trị của H(X | Y): " + conditionalEntropy(probabilities))
+console.log("Gía trị của H(Y | X): " + conditionalEntropy2(probabilities))
+console.log("Gía trị của H(Y) - H(Y | X): " + calculate(probabilities));
+console.log("Gía trị của I(X; Y): " + mutualInformation(probabilities));
+console.log("Gía trị của D(P(x)||P(y)): " + divergenceXY);
+console.log("Gía trị của D(P(y)||P(x)): " + divergenceYX);

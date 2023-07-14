@@ -11,7 +11,7 @@
   
 //   // Xây dựng cây Huffman
 //   function buildHuffmanTree(frequencies) {
-//     const heap = new PriorityQueue();
+//     const heap = new Queue();
 //     for (let char in frequencies) {
     
 //       heap.enqueue({ char, frequency: frequencies[char] });
@@ -54,7 +54,7 @@
 //   }
   
 //   // Định nghĩa lớp hàng đợi ưu tiên
-//   class PriorityQueue {
+//   class Queue {
 //     constructor() {
 //       this.values = [];
 //     }
@@ -97,7 +97,12 @@
 
 
 
+// ------------------------------------------------------------------------------------------------------------
+// // câu 2 Nhập vào 1 chuỗi ký tự không dấu kích thướng bất kỳ , không phân biệt chữ hoa, chữ thường
+      // mã hóa theo huffman
+      // mã hóa theo shanno-Fano cho chuỗi trên  tính hiệu xuất mã hóa và tính dư thừa
 
+// ------------------------------------------------------------------------------------------------------------
 class Node {
   constructor(char, freq) {
     this.char = char;
@@ -107,7 +112,8 @@ class Node {
   }
 }
 
-function calculateFrequencies(data) {
+// Tính tần suất xuất hiện của các kí tự trong chuỗi
+function frequency(data) {
   const frequencies = {};
   for (let i = 0; i < data.length; i++) {
     const char = data[i];
@@ -117,21 +123,23 @@ function calculateFrequencies(data) {
 }
 
 function buildHuffmanTree(frequencies) {
-  const priorityQueue = [];
+  const Queue = [];
   for (let char in frequencies) {
-    priorityQueue.push(new Node(char, frequencies[char]));
+    Queue.push(new Node(char, frequencies[char]));
   }
-  priorityQueue.sort((a, b) => a.freq - b.freq);
-  while (priorityQueue.length > 1) {
-    const leftNode = priorityQueue.shift();
-    const rightNode = priorityQueue.shift();
+  Queue.sort((a, b) => a.freq - b.freq);
+  while (Queue.length > 1) {
+    const leftNode = Queue.shift();
+    const rightNode = Queue.shift();
     const parentNode = new Node(null, leftNode.freq + rightNode.freq);
     parentNode.left = leftNode;
     parentNode.right = rightNode;
-    priorityQueue.push(parentNode);
-    priorityQueue.sort((a, b) => a.freq - b.freq);
+    Queue.push(parentNode);
+    Queue.sort((a, b) => a.freq - b.freq);
   }
-  return priorityQueue[0];
+  // console.log({Queue});
+
+  return Queue[0];
 }
 
 function assignCodes(node, code = '', codes = {}) {
@@ -141,18 +149,23 @@ function assignCodes(node, code = '', codes = {}) {
     assignCodes(node.left, code + '0', codes);
     assignCodes(node.right, code + '1', codes);
   }
+  console.log("assign code ", codes)
   return codes;
 }
 
-function encodeData(data, codes) {
+// Mã hóa chuỗi bằng mã Huffman
+function encodeHuffman(data, codes) {
   let encodedData = '';
   for (let i = 0; i < data.length; i++) {
     const char = data[i];
     encodedData += codes[char];
   }
+  console.log({encodeHuffman})
   return encodedData;
 }
 
+
+// giải mã
 function decodeData(encodedData, huffmanTree) {
   let decodedData = '';
   let currentNode = huffmanTree;
@@ -172,27 +185,24 @@ function decodeData(encodedData, huffmanTree) {
 }
 
 function huffmanCoding(data) {
-  const frequencies = calculateFrequencies(data);
+  const frequencies = frequency(data);
   const huffmanTree = buildHuffmanTree(frequencies);
   const codes = assignCodes(huffmanTree);
-  const encodedData = encodeData(data, codes);
+  const encodedData = encodeHuffman(data, codes);
   const decodedData = decodeData(encodedData, huffmanTree);
   return { codes, encodedData, decodedData };
 }
 
-// Example usage:ơ
-const input = prompt("Nhập vào một chuỗi ký tự không dấu: ");
 
-const result = huffmanCoding(input);
+
+
+const input = prompt("Nhập vào một chuỗi ký tự không dấu: ");
+const result = huffmanCoding(input.toLowerCase());
 
 console.log('Input data:', input);
 console.log('Huffman Codes:', result.codes);
 console.log('Encoded data:', result.encodedData);
 console.log('Decoded data:', result.decodedData);
-
-
-
-
 
 
 
