@@ -18,12 +18,12 @@ while(true){
     for (let j = 0; j < N;j++) {
       while (true) {
         let prob = eval(prompt(`Nhập xác suấ P(${i+1},${j+1})` ));
-        if (prob > 0 && prob < 1) {
+        if (prob >= 0 && prob <= 1) {
           row.push(prob);
           sumP += prob
           break;
         } else {
-          alert("không được âm , bằng 0, lớn hơn 1");
+          alert("không được âm , lớn hơn 1");
         }
       }
     }
@@ -50,25 +50,25 @@ input()
 // ------------------------------------------------------------------------------------------------------------------------
 
 
-// 1.TÍNH H(X)
-function entropyHx(probabilities) {
-  let Hx = 0;
+// 1.TÍNH H(y)
+function entropyHy(probabilities) {
+  let Hy = 0;
 
   for (let i = 0; i < probabilities.length; i++) {
     let sumRow = 0;
     for (let j = 0; j < probabilities[i].length;j++) {
       sumRow += probabilities[i][j];
     }
-    Hx -= sumRow * Math.log2(sumRow);
+    Hy -= sumRow * Math.log2(sumRow);
   }
-  return Hx;
+  return Hy;
 }
 
 
-// 2. TÍNH H(Y)
+// 2. TÍNH H(x)
 // -------------------------------------------------------
-const entropyHy = (probabilities) => {
-  let Hy = 0;
+const entropyHx = (probabilities) => {
+  let Hx = 0;
 
   const columnSums = [];
   
@@ -87,9 +87,9 @@ const entropyHy = (probabilities) => {
   // tính entropy của H(y)
   for (let i = 0; i < columnSums.length; i++) {
 
-    Hy-= columnSums[i] * Math.log2(columnSums[i]);
+    Hx-= columnSums[i] * Math.log2(columnSums[i]);
   }
-  return Hy;
+  return Hx;
 };
 
 
@@ -100,7 +100,7 @@ const entropyHxy = (probabilities) => {
   let conditionalEntropy = 0;
   for (let i = 0; i < probabilities.length; i++) {
     for (let j = 0; j < probabilities[i].length;j++) {
-      conditionalEntropy -= probabilities[i][j] * Math.log2(probabilities[i][j]);
+      conditionalEntropy -= probabilities[i][j] * (probabilities[i][j]!= 0 ? Math.log2(probabilities[i][j]) : 0);
 
     }
    
@@ -117,6 +117,63 @@ const entropyHxy = (probabilities) => {
 
 // B1.TÍNH Py
 const py =(probabilities)=>{
+  let y =[]
+  for (let i = 0; i < probabilities.length; i++) {
+    let sum = 0
+    for (let j = 0; j < probabilities[i].length;j++) {
+      sum +=  probabilities[i][j]  
+    }
+    y=[...y,sum]
+   
+  }
+  // console.log("px",y)
+  return y
+
+}
+
+
+// B2.TÍNH XÁC XUẤT P(x|y)
+const conditionalProbabilities = (probabilities) => {
+  let y = py(probabilities) 
+  let arrP = [] // đây là P(x\y)
+  let arrStemp = []
+  for (let i = 0; i < probabilities.length; i++) {
+    for (let j = 0; j < probabilities[i].length;j++) {
+      /// tính giái trị của các P(Xi/Yi)
+      let a = (probabilities[i][j] / y[j]) ? probabilities[i][j] / y[j] : 0
+      arrStemp = [...arrStemp,a]
+    }
+    arrP = [...arrP,arrStemp]
+    arrStemp = []
+   
+  }
+  // console.log("ma trận P(x/y)",arr)
+  return arrP
+};
+
+// B3. TÍNH H(X|Y)
+const conditionalEntropy = (probabilities)=>{
+  let p = conditionalProbabilities(probabilities)
+  let conditionalEntropy = 0
+  for (let i = 0; i < probabilities.length; i++) {
+    for (let j = 0; j < probabilities[i].length;j++) {
+      conditionalEntropy -= probabilities[i][j] *(p[i][j]!=0 ? Math.log2(p[i][j]) : 0);
+        
+    }
+
+   
+  }
+  return conditionalEntropy
+
+}
+
+
+
+
+// 5. Tính H(Y|X) 
+// ----------------------------------------------------------------------------
+// B1.TÍNH Px
+const px =(probabilities)=>{
   const columnSums = [];
   
   // Khởi tạo các giá trị ban đầu của columnSums là 0
@@ -136,63 +193,6 @@ const py =(probabilities)=>{
 }
 
 
-// B2.TÍNH XÁC XUẤT P(x|y)
-const conditionalProbabilities = (probabilities) => {
-  let y = py(probabilities) 
-  let arrP = [] // đây là P(x\y)
-  let arrStemp = []
-  for (let i = 0; i < probabilities.length; i++) {
-    for (let j = 0; j < probabilities[i].length;j++) {
-      /// tính giái trị của các P(Xi/Yi)
-      let a = probabilities[i][j] / y[j] 
-      arrStemp = [...arrStemp,a]
-    }
-    arrP = [...arrP,arrStemp]
-    arrStemp = []
-   
-  }
-  // console.log("ma trận P(x/y)",arr)
-  return arrR
-};
-
-// B3. TÍNH H(X|Y)
-const conditionalEntropy = (probabilities)=>{
-  let p = conditionalProbabilities(probabilities)
-  let conditionalEntropy = 0
-  for (let i = 0; i < probabilities.length; i++) {
-    for (let j = 0; j < probabilities[i].length;j++) {
-      conditionalEntropy -= probabilities[i][j] * Math.log2(p[i][j]);
-        
-    }
-
-   
-  }
-  return conditionalEntropy
-
-}
-
-
-
-
-// 5. Tính H(Y|X) 
-// ----------------------------------------------------------------------------
-
-// B1.TÍNH Px
-const px =(probabilities)=>{
-  let x =[]
-  for (let i = 0; i < probabilities.length; i++) {
-    let sum = 0
-    for (let j = 0; j < probabilities[i].length;j++) {
-      sum +=  probabilities[i][j]  
-    }
-    x=[...x,sum]
-   
-  }
-  // console.log("px",y)
-  return x
-
-}
-
 
 // B2.TÍNH XÁC XUẤT P(Y/X)
 const conditionalProbabilities2 = (probabilities) => {
@@ -201,7 +201,7 @@ const conditionalProbabilities2 = (probabilities) => {
   let arrStemp = []
   for (let i = 0; i < probabilities.length; i++) {
     for (let j = 0; j < probabilities[i].length;j++) {
-      let a = probabilities[i][j] / x[i] /// tính giái trị của các P(X1/Y1)
+      let a = (probabilities[i][j] / x[i]) ? (probabilities[i][j] / x[i]) : 0 /// tính giái trị của các P(X1/Y1)
       arrStemp = [...arrStemp,a]
     }
     arr = [...arr,arrStemp]
@@ -219,7 +219,7 @@ const conditionalEntropy2 = (probabilities)=>{
   let conditionalEntropy = 0
   for (let i = 0; i < probabilities.length; i++) {
     for (let j = 0; j < probabilities[i].length;j++) {
-      conditionalEntropy -= probabilities[i][j] * Math.log2(p[i][j]);
+      conditionalEntropy -= probabilities[i][j] *(p[i][j] != 0 ? Math.log2(p[i][j]) : 0);
         
     }
 
@@ -250,7 +250,7 @@ const mutualInformation =(probabilities)=> {
 
   for (let i = 0; i < probabilities.length; i++) {
     for (let j = 0; j < probabilities[i].length;j++) {
-     I +=probabilities[i][j]  * Math.log2(p[i][j] / x[i]);       
+     I +=probabilities[i][j]  *((p[i][j] / x[i]) && (p[i][j] / x[i]) != 0  ? Math.log2(p[i][j] / x[i]) : 0);       
     }
    
   }
