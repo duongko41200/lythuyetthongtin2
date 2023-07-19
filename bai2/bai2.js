@@ -149,7 +149,7 @@ function assignCodes(node, code = '', codes = {}) {
     assignCodes(node.left, code + '0', codes);
     assignCodes(node.right, code + '1', codes);
   }
-  console.log("assign code ", codes)
+  // console.log("assign code ", codes)
   return codes;
 }
 
